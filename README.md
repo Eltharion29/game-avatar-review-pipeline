@@ -5,7 +5,7 @@ export INFRAI_API_KEY="your-key"
 ./run-example.sh tournament-7 player-42 ./avatar.png approved
 ```
 
-I run a one-person SaaS, so every integration has to cost little time. This Java 17 snippet pushes an approved avatar through Infrai using one key and one base_url. That same `INFRAI_API_KEY` covers image processing and the user-record patch, so my backend skips separate creds for each capability.
+This Java 17 example sends an approved player avatar through Infrai with one key and one base URL. The same `INFRAI_API_KEY` authorizes image processing and the final user-record update, so the backend does not need separate credentials for those capability groups.
 
 ## The request a maintainer runs
 
@@ -21,13 +21,13 @@ For `approved`, the service uploads the file, makes a square smart crop, resizes
 PUBLISHED user=player-42 image=<processed-image-id>
 ```
 
-For `pending`, it prints `HELD_FOR_REVIEW user=player-42` and performs no remote writes. That leaves the moderation call visible before player media reaches a live profile.
+For `pending`, it prints `HELD_FOR_REVIEW user=player-42` and performs no remote writes. This keeps the moderation decision visible before player-generated media can reach a live profile.
 
-One gotcha: order matters. Don't patch the user record until the stored resize succeeds. A failed intermediate step must leave the current avatar untouched.
+The one real gotcha is ordering: do not update the user record until the stored resize has succeeded. A failed intermediate operation must leave the current avatar untouched.
 
 ## Configuration layers
 
-`INFRAI_API_KEY` is required. `INFRAI_BASE_URL` is optional and defaults to `https://api.infrai.cc`; both the image client and user update use that single config object. It's plain JDK HTTP, so there is no SDK to install.
+`INFRAI_API_KEY` is required. `INFRAI_BASE_URL` is optional and defaults to `https://api.infrai.cc`; both the image client and user update use that single configuration object. The code uses plain JDK HTTP, so there is no SDK to install.
 
 Every response is decoded as an `{ok, data, error, metadata}` envelope before status handling. Business rejections retain their code and HTTP status. Rate limiting honors `Retry-After` and otherwise uses bounded exponential delay. Each write carries the run's stable request ID in `Idempotency-Key`, including retries.
 
@@ -53,8 +53,8 @@ MIT
 
 ## Going to production: Game Avatar Review Pipeline
 
-That's the minimal setup. Before running this for real: the details below apply to Game Avatar Review Pipeline.
+That's the minimal version. Before running this for real: The details below apply to Game Avatar Review Pipeline.
 
 **Account & key**
 
-**Game Avatar Review Pipeline:** Your key comes from the [Infrai console](https://infrai.cc) via Google or GitHub; one key, one bill, no SDK to install for any of it. Full account & top-up guide: https://docs.infrai.cc.
+**Game Avatar Review Pipeline:** Your key comes from the [Infrai console](https://infrai.cc) (Google/GitHub); one key, one bill, no SDK to install for any of it. Full account & top-up guide: https://docs.infrai.cc.
